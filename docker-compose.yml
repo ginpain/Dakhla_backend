@@ -1,46 +1,54 @@
 services:
   frontend:
     image: ghcr.io/ginpain/dakhla-front:latest
-    # build:
-    #   context: .
-    #   dockerfile: Dockerfile.dev
     labels:
-      - "traefik.enable=true"
-
-      # -------- Router (HTTPS) --------
-      - "traefik.http.routers.dakhla.rule=Host(`dakhla.greenh2atlas.ma`)"
-      - "traefik.http.routers.dakhla.entrypoints=websecure"
-      - "traefik.http.routers.dakhla.tls.certresolver=myresolver"
-    #ports:
-    #  - "4000:3000"
-    networks:
-      - proxy
-
-    # environment:
-    #   - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?schema=public
-    #   - GEOCODE_API_KEY=${GEOCODE_API_KEY}
+      - traefik.enable=true
+      - traefik.http.routers.dakhla.rule=Host(`dakhla.greenh2atlas.ma`)
+      - traefik.http.routers.dakhla.entrypoints=websecure
+      - traefik.http.routers.dakhla.tls.certresolver=myresolver
+    ports:
+      - "4000:3000"
+    networks: [proxy]
     restart: always
     depends_on:
       - db
+
+  backend:
+    build:
+      context: ./backend        # uncomment if you want live build
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"             # optional; Traefik can expose it
+    environment:
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: db               # ← crucial
+      DB_PORT: 5432
+    networks: [proxy]
+    depends_on:                 # ← must be **inside** backend
+      db:
+        condition: service_healthy
+
   db:
     image: postgis/postgis:16-3.4
     restart: always
     ports:
-      - "5438:5432"
-    networks:
-      - proxy
+      - "${DB_PORT:-5438}:5432"   # host 5438 → container 5432
+    networks: [proxy]
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     healthcheck:
-      test: [ "CMD", "pg_isready -U ${DB_USER}" ]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
     volumes:
       - ./db-data:/var/lib/postgresql/data
       - ./db-init:/docker-entrypoint-initdb.d
+
 networks:
   proxy:
     external: true

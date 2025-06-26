@@ -76,9 +76,8 @@ DATABASES = {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'Dakhla',
         'USER': 'postgres',
-        # 'PASSWORD': os.getenv('DATABASE_PASSWORD', 'abdo1234'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': 'localhost',
+        "HOST": os.getenv("DB_HOST", "db"),
         'PORT': '5432',
     }
 }
@@ -111,10 +110,12 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
 # GDAL and GEOS library paths
-GDAL_LIBRARY_PATH = r'C:\Users\DELL\Desktop\dev\CHATBOT\CHATBOT\env\Lib\site-packages\osgeo\gdal.dll'
-GEOS_LIBRARY_PATH = r'C:\Users\DELL\Desktop\dev\CHATBOT\CHATBOT\env\Lib\site-packages\osgeo\geos_c.dll'
-os.environ['GDAL_LIBRARY_PATH'] = GDAL_LIBRARY_PATH
-os.environ['GEOS_LIBRARY_PATH'] = GEOS_LIBRARY_PATH
+# GDAL_LIBRARY_PATH = r'C:\Users\DELL\Desktop\dev\CHATBOT\CHATBOT\env\Lib\site-packages\osgeo\gdal.dll'
+# GEOS_LIBRARY_PATH = r'C:\Users\DELL\Desktop\dev\CHATBOT\CHATBOT\env\Lib\site-packages\osgeo\geos_c.dll'
+# os.environ['GDAL_LIBRARY_PATH'] = GDAL_LIBRARY_PATH
+# os.environ['GEOS_LIBRARY_PATH'] = GEOS_LIBRARY_PATH
+GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH')  # optional
+GEOS_LIBRARY_PATH = os.getenv('GEOS_LIBRARY_PATH')
 
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True

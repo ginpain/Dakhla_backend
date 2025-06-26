@@ -99,3 +99,4 @@ Werkzeug==3.0.3
 wheel==0.43.0
 wrapt==1.16.0
 xyzservices==2024.6.0
+gdal==3.6.2
