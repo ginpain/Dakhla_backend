@@ -11,4 +11,4 @@ __pycache__/
 .vscode/
 .idea/
 
-db-data
+/db-data
