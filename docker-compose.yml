@@ -18,7 +18,12 @@ services:
       context: ./backend        # uncomment if you want live build
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"             # optional; Traefik can expose it
+      - "8000:8000"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dakhla.rule=Host(`apidakhla.greenh2atlas.ma`)
+      - traefik.http.routers.dakhla.entrypoints=websecure
+      - traefik.http.routers.dakhla.tls.certresolver=myresolver
     environment:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
@@ -26,7 +31,7 @@ services:
       DB_HOST: db               # ← crucial
       DB_PORT: 5432
     networks: [proxy]
-    depends_on:                 # ← must be **inside** backend
+    depends_on:                 
       db:
         condition: service_healthy
 
